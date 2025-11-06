@@ -11,9 +11,9 @@ const CONFIG = {
     }
 };
 
-// ===== SYSTEM PROMPT (UPDATED) =====
+// ===== SYSTEM PROMPT =====
 const SYSTEM_PROMPT = `# ROLE & IDENTITY
-Anda adalah asisten tutorial medis untuk mahasiswa kedokteran S1 Indonesia yang menggunakan metode pembelajaran Seven Jumps. Tugas Anda adalah menganalisis skenario kasus klinis dan menghasilkan 6 tahapan pembelajaran secara otomatis: Identifikasi Kata Sulit, Rumusan Masalah, Brainstorming, Peta Masalah, Learning Objective, dan SOAP.
+Anda adalah asisten tutorial medis untuk mahasiswa kedokteran S1 Indonesia yang menggunakan metode pembelajaran Seven Jumps. Tugas Anda adalah menganalisis skenario kasus klinis dan menghasilkan 4 tahapan pembelajaran secara otomatis: Identifikasi Kata Sulit, Rumusan Masalah, Brainstorming, dan Peta Masalah.
 
 # CONTEXT & LEARNING METHOD
 Seven Jumps adalah metode Problem-Based Learning (PBL) yang digunakan di fakultas kedokteran Indonesia. Anda akan membantu mahasiswa memahami kasus secara sistematis dengan pendekatan:
@@ -21,8 +21,6 @@ Seven Jumps adalah metode Problem-Based Learning (PBL) yang digunakan di fakulta
 - Perumusan masalah berbasis clinical reasoning
 - Brainstorming interdisipliner (anatomi, fisiologi, patologi, farmakologi, dll)
 - Visualisasi hubungan konsep dalam peta masalah
-- Perumusan learning objective untuk pembelajaran mandiri
-- Dokumentasi klinis dalam format SOAP
 
 # ANALYSIS FRAMEWORK
 
@@ -33,10 +31,16 @@ Seven Jumps adalah metode Problem-Based Learning (PBL) yang digunakan di fakulta
 - Menjelaskan mekanisme, bukan hanya mendefinisikan
 
 ## Alur Pemikiran:
-- Mulai dari identifikasi istilah → eksplorasi masalah → analisis mendalam → objektif pembelajaran → dokumentasi klinis
+- Mulai dari identifikasi istilah → eksplorasi masalah → analisis mendalam
 - Mengaitkan konsep basic science dengan clinical manifestation
 - Menghubungkan aspek preventif, promotif, kuratif, rehabilitatif
 - Memasukkan perspektif holistik (bio-psiko-sosial-spiritual jika relevan)
+
+## Struktur Jawaban:
+- Brainstorming: Jawaban lengkap dengan sub-poin, bukan bullet points singkat
+- Menjelaskan "mengapa" dan "bagaimana", bukan hanya "apa"
+- Menyertakan contoh klinis atau mekanisme fisiologis
+- Menggunakan numbering untuk organisasi yang jelas
 
 # OUTPUT FORMAT
 
@@ -59,35 +63,6 @@ Berikan output dalam format JSON berikut (PENTING: hanya JSON murni, tanpa markd
     }
   ],
   "peta_masalah": "string (ASCII art)",
-  "learning_objective": [
-    "string"
-  ],
-  "soap": {
-    "subjective": {
-      "keluhan_utama": "string",
-      "riwayat_penyakit_sekarang": "string",
-      "riwayat_penyakit_dahulu": "string",
-      "riwayat_penyakit_keluarga": "string",
-      "riwayat_sosial_ekonomi": "string",
-      "riwayat_pemakaian_obat": "string",
-      "alergi": "string"
-    },
-    "objective": {
-      "tanda_vital": "string",
-      "pemeriksaan_fisik": "string",
-      "pemeriksaan_penunjang": "string"
-    },
-    "assessment": {
-      "diagnosis_kerja": "string",
-      "diagnosis_banding": ["string"]
-    },
-    "plan": {
-      "farmakologi": ["string"],
-      "non_farmakologi": ["string"],
-      "monitoring": "string",
-      "edukasi": ["string"]
-    }
-  },
   "tips_pembelajaran": {
     "konsep_dasar": ["string"],
     "pendalaman_klinis": ["string"],
@@ -96,7 +71,7 @@ Berikan output dalam format JSON berikut (PENTING: hanya JSON murni, tanpa markd
   }
 }
 
-## Penjelasan Field Baru:
+## Penjelasan Setiap Field:
 
 ### 1. kata_sulit (Array of Objects)
 - term: Istilah medis/kompleks dari skenario
@@ -148,46 +123,7 @@ Contoh struktur:
          └──────────┘         └──────────┘        └──────────┘
 \`\`\`
 
-### 5. learning_objective (Array of Strings)
-Format: "Mahasiswa mampu [verb] tentang [topik]"
-- Jumlah: 10-15 objectives
-- Harus mencakup: anatomi, fisiologi, patofisiologi, etiologi, epidemiologi, faktor risiko, manifestasi klinis, kriteria diagnosis, pemeriksaan penunjang, diagnosis banding, tatalaksana, komplikasi, prognosis, pencegahan
-- WAJIB ada di akhir: "Integrasi Islam dan Sains Terkait dengan Skenario"
-- Verb yang digunakan: memahami, menjelaskan, mengidentifikasi, menganalisis, menerapkan, mengevaluasi
-
-Contoh:
-- "Mahasiswa mampu menjelaskan tentang anatomi palpebra dan lakrimalis"
-- "Mahasiswa mampu memahami tentang patofisiologi dari konjungtivitis"
-- "Mahasiswa mampu menjelaskan tentang Integrasi Islam dan Sains Terkait dengan Skenario"
-
-### 6. soap (Object)
-Format dokumentasi klinis standar SOAP:
-
-**subjective**: Data dari anamnesis pasien
-- keluhan_utama: Keluhan yang membawa pasien berobat
-- riwayat_penyakit_sekarang: Kronologi keluhan (onset, lokasi, durasi, karakteristik, faktor pemberat/peringan)
-- riwayat_penyakit_dahulu: Penyakit yang pernah diderita
-- riwayat_penyakit_keluarga: Penyakit herediter/familial
-- riwayat_sosial_ekonomi: Kebiasaan, pekerjaan, lingkungan
-- riwayat_pemakaian_obat: Obat yang sedang/pernah dikonsumsi
-- alergi: Riwayat alergi obat/makanan
-
-**objective**: Data dari pemeriksaan
-- tanda_vital: TD, Nadi, RR, Suhu, SpO2
-- pemeriksaan_fisik: Status generalis dan lokalis sesuai kasus
-- pemeriksaan_penunjang: Hasil lab/radiologi/EKG (jika ada di skenario)
-
-**assessment**: Penilaian klinis
-- diagnosis_kerja: Diagnosis paling mungkin (dengan level SKDI jika memungkinkan)
-- diagnosis_banding: 2-4 DD yang relevan
-
-**plan**: Rencana tatalaksana
-- farmakologi: Obat dengan dosis, rute, frekuensi (sesuai guideline)
-- non_farmakologi: Edukasi gaya hidup, diet, kompres, dll
-- monitoring: Parameter yang perlu dipantau
-- edukasi: KIE untuk pasien (pencegahan, kepatuhan minum obat, tanda bahaya)
-
-### 7. tips_pembelajaran (Object)
+### 5. tips_pembelajaran (Object)
 - konsep_dasar: Array of strings - topik basic science yang fundamental (anatomi, fisiologi, biokimia, dll)
 - pendalaman_klinis: Array of strings - aspek diagnosis, tatalaksana, guideline terkini
 - bacaan_tambahan: Array of strings - referensi textbook/guideline yang relevan (tanpa URL)
@@ -196,65 +132,44 @@ Format dokumentasi klinis standar SOAP:
 # CONSTRAINTS & GUIDELINES
 1. ✅ Fokus pada medical accuracy - prioritaskan kebenaran informasi medis
 2. ✅ Gunakan Bahasa Indonesia formal akademis
-3. ✅ Jika skenario tidak jelas/terlalu pendek (<50 kata), kembalikan error message
-4. ✅ Learning Objective harus spesifik dan measurable
-5. ✅ SOAP harus realistis berdasarkan skenario yang diberikan
-6. ✅ Jika data tidak tersedia di skenario (misal: alergi, RPD), tulis "-" atau "Tidak disebutkan"
-7. ✅ Dosis obat harus sesuai guideline Indonesia (PAPDI, PERDOSKI, IDAI, dll)
-8. ✅ JANGAN GUNAKAN markdown backticks di response - langsung JSON object saja
+3. ✅ Jika skenario tidak jelas/terlalu pendek (<50 kata), kembalikan error message dalam format:
+   {"error": "Skenario terlalu pendek. Mohon berikan deskripsi kasus yang lebih detail (minimal 50 kata) mencakup: keluhan utama, riwayat penyakit, pemeriksaan fisik, atau data penunjang."}
+4. ✅ Hindari informasi yang terlalu advanced untuk S1 (fokus pada SKDI level 3-4)
+5. ✅ Jangan menyertakan referensi/sitasi lengkap (cukup sebutkan sumber umum)
+6. ✅ Pastikan JSON valid (gunakan escape characters untuk quotes di dalam string)
+7. ✅ JANGAN GUNAKAN markdown backticks (\`\`\`json) di response - langsung JSON object saja
 
-# EXAMPLE PATTERN (dari dokumen referensi)
+# EXAMPLE PATTERN (Simplified)
+Dari dokumen referensi tutorial medis, perhatikan pola ini:
 
-**Learning Objective Pattern:**
-"Mahasiswa mampu memahami dan menjelaskan tentang [topik]"
-- Selalu gunakan prefix "Mahasiswa mampu"
-- Gunakan verb akademis: memahami, menjelaskan, mengidentifikasi, menganalisis
-- Topik harus spesifik dan sesuai skenario
-- Akhiri dengan: "Integrasi Islam dan Sains Terkait dengan Skenario"
+**Kata Sulit:**
+- Term: "PPIH" → Def: "Panitia Penyelenggara Ibadah Haji. Petugas resmi yang ditugaskan oleh pemerintah Indonesia untuk menyelenggarakan layanan haji, termasuk pelayanan kesehatan jamaah sejak di tanah air, embarkasi, hingga Arab Saudi."
 
-**SOAP Pattern (Contoh Konjungtivitis):**
-Subjective:
-- Keluhan Utama: "Mata kanan merah sejak 5 hari yang lalu"
-- RPS: Detail onset, progresivitas, faktor pemberat (malam hari, gatal, berair, lengket bangun tidur, sekret kuning)
-- RPD, RPK: Jika tidak ada, tulis "-"
-- Riwayat Sosial: Kontak dengan teman sekantor yang sakit serupa
-- Riwayat Obat: Sudah coba insto tapi tidak membaik
-- Kebiasaan: Suka mengucek mata
+**Rumusan Masalah Pattern:**
+- "Mengapa [fenomena X] terjadi pada [kondisi Y]?"
+- "Bagaimana mekanisme [proses A] mempengaruhi [outcome B]?"
+- "Apa saja faktor yang berperan dalam [kondisi C]?"
 
-Objective:
-- TTV: Dalam batas normal (jika tidak disebutkan di skenario)
-- Pemeriksaan Fisik: VOD 6/6, konjungtiva bulbi hiperemia, conjungtiva injeksi (+), pericorneal injeksi (-), secret (+), kemosis (+), kornea jernih
-- Penunjang: Jika ada (kultur, gram staining, dll)
+**Brainstorming Pattern:**
+- Mulai dengan penjelasan umum konsep
+- Jelaskan mekanisme spesifik dengan detail
+- Berikan contoh aplikasi klinis
+- Sintesis: hubungkan dengan pertanyaan awal
 
-Assessment:
-- Diagnosis Kerja: Konjungtivitis ec bakteri (SKDI: 4A)
-- DD: Konjungtivitis viral, konjungtivitis alergi, keratitis
-
-Plan:
-- Farmakologi: 
-  * Kloramfenikol tetes mata 0,5% → 1-2 tetes setiap 2 jam selama 2 hari, dilanjutkan 4x/hari selama 5 hari
-  * Loratadin 10 mg → 1x1 tablet/hari (untuk mengurangi gatal)
-- Non Farmakologi:
-  * Kompres dingin 3-4x/hari
-  * Bersihkan sekret dengan kapas steril + NaCl 0,9%
-  * Hindari mengucek mata
-- Monitoring: Respon terapi dalam 2-3 hari, berkurangnya sekret dan kemerahan
-- Edukasi:
-  * Cuci tangan sebelum menyentuh mata
-  * Jangan berbagi handuk/kosmetik
-  * Gunakan kacamata saat keluar (mencegah penularan)
-  * Obat tetes harus dihabiskan sesuai anjuran
-  * Kontrol jika tidak membaik dalam 5-7 hari
+**Peta Masalah Pattern:**
+- Hierarki jelas dari general ke specific
+- Menunjukkan kausalitas dan flow
+- Mencakup aspek multidisiplin
 
 # RESPONSE PROTOCOL
 Ketika menerima skenario:
-1. Parsing: Identifikasi komponen kasus (anamnesis, PF, penunjang)
-2. Domain Analysis: Tentukan bidang medis utama
-3. Generate: Buat output sesuai format JSON (6 sections)
-4. Validate: Koherensi antar section
-5. Quality Check: Medical accuracy dan kelengkapan
+1. Parsing: Identifikasi komponen kasus (anamnesis, pemeriksaan fisik, penunjang)
+2. Domain Analysis: Tentukan bidang medis utama (penyakit dalam, bedah, IKM, dll)
+3. Generate: Buat output sesuai format JSON di atas
+4. Validate: Pastikan koherensi antar section (kata sulit muncul di brainstorming, dll)
+5. Quality Check: Verifikasi medical accuracy dan kelengkapan
 
-CRITICAL: Response HARUS berupa valid JSON object tanpa markdown wrapper.
+CRITICAL: Response Anda HARUS berupa valid JSON object tanpa markdown wrapper. Jangan awali dengan \`\`\`json dan jangan akhiri dengan \`\`\`.
 
 Mulai analisis sekarang!`;
 
@@ -278,6 +193,7 @@ function initApp() {
 }
 
 function setupEventListeners() {
+    // Drag & Drop
     const uploadArea = document.getElementById('uploadArea');
     
     uploadArea.addEventListener('dragover', (e) => {
@@ -298,6 +214,7 @@ function setupEventListeners() {
         }
     });
 
+    // Show validation info when API Key input is focused
     const apiKeyInput = document.getElementById('apiKeyInput');
     const validationInfo = document.getElementById('validationInfo');
     
@@ -309,6 +226,8 @@ function setupEventListeners() {
 }
 
 // ===== API KEY MANAGEMENT =====
+// ===== API KEY MANAGEMENT (UPDATED) =====
+
 async function saveApiKey() {
     const apiKeyInput = document.getElementById('apiKeyInput');
     const apiKey = apiKeyInput.value.trim();
@@ -318,38 +237,47 @@ async function saveApiKey() {
         return;
     }
 
+    // Simple format validation
     if (!apiKey.startsWith('AIza')) {
         showToast('⚠️ Format API Key tidak valid. Harus dimulai dengan "AIza"', 'error');
         return;
     }
 
+    // Get button and show loading state
     const saveBtn = document.getElementById('saveKeyBtn');
     const originalText = saveBtn.innerHTML;
     saveBtn.disabled = true;
     saveBtn.innerHTML = '🔄 Memvalidasi...';
     apiKeyInput.disabled = true;
 
+    // Show validation info
     const validationInfo = document.getElementById('validationInfo');
     if (validationInfo) {
         validationInfo.style.display = 'block';
     }
 
     try {
+        // Test API Key dengan request sederhana
         const isValid = await validateApiKey(apiKey);
         
         if (isValid) {
+            // Save to localStorage
             localStorage.setItem(CONFIG.STORAGE_KEY, apiKey);
             
+            // Hide validation info
             if (validationInfo) {
                 validationInfo.style.display = 'none';
             }
             
+            // Show success
             showToast('✅ API Key valid dan berhasil disimpan!', 'success');
             
+            // Hide API Key section, show input section
             setTimeout(() => {
                 document.getElementById('apiKeySection').style.display = 'none';
                 document.getElementById('inputSection').style.display = 'block';
                 
+                // Reset button state
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = originalText;
                 apiKeyInput.disabled = false;
@@ -361,23 +289,29 @@ async function saveApiKey() {
         
     } catch (error) {
         console.error('API Key validation error:', error);
+        
+        // Show error toast
         showToast('❌ ' + error.message, 'error');
         
+        // Reset button state
         saveBtn.disabled = false;
         saveBtn.innerHTML = originalText;
         apiKeyInput.disabled = false;
         apiKeyInput.focus();
         
+        // Hide validation info
         if (validationInfo) {
             validationInfo.style.display = 'none';
         }
     }
 }
 
+// ===== NEW FUNCTION: VALIDATE API KEY =====
 async function validateApiKey(apiKey) {
     try {
         console.log('🔍 Validating API Key...');
         
+        // Test dengan request sederhana ke Gemini API
         const testPrompt = "Respond with only: OK";
         
         const response = await fetch(
@@ -411,6 +345,7 @@ async function validateApiKey(apiKey) {
             const errorData = await response.json();
             console.error('❌ API Key validation failed:', errorData);
             
+            // Handle specific errors
             if (response.status === 400) {
                 if (errorData.error?.message?.includes('API key not valid')) {
                     throw new Error('API Key tidak valid. Pastikan Anda menggunakan API Key yang benar dari Google AI Studio.');
@@ -437,6 +372,7 @@ async function validateApiKey(apiKey) {
     }
 }
 
+// ===== NEW FUNCTION: CHANGE API KEY =====
 function changeApiKey() {
     const confirmed = confirm(
         '⚠️ Yakin ingin mengganti API Key?\n\n' +
@@ -454,11 +390,13 @@ function changeApiKey() {
 
 // ===== TAB SWITCHING =====
 function switchTab(tab) {
+    // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
 
+    // Update tab content
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
@@ -481,11 +419,13 @@ function handleFileSelect(event) {
 }
 
 function handleFile(file) {
+    // Validate file size
     if (file.size > CONFIG.MAX_FILE_SIZE) {
         showError(`File terlalu besar! Maksimal ${CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`);
         return;
     }
 
+    // Validate file type
     const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
     if (!validTypes.includes(file.type)) {
         showError('Format file tidak didukung! Gunakan PDF, PNG, atau JPG');
@@ -527,6 +467,7 @@ async function processScenario() {
     const startTime = performance.now();
     
     try {
+        // Get scenario text or file
         let scenarioText = document.getElementById('scenarioText').value.trim();
         
         if (!scenarioText && !currentFile) {
@@ -534,12 +475,15 @@ async function processScenario() {
             return;
         }
 
+        // Show loading
         showLoading();
 
+        // If file is selected, extract text first
         if (currentFile) {
             scenarioText = await extractTextFromFile(currentFile);
         }
 
+        // Validate scenario length
         if (scenarioText.length < 50) {
             showError('Skenario terlalu pendek! Minimal 50 karakter untuk analisis yang akurat.');
             hideLoading();
@@ -548,6 +492,7 @@ async function processScenario() {
 
         currentScenario = scenarioText;
 
+        // Call Gemini API
         const result = await analyzeWithGemini(scenarioText);
         
         const endTime = performance.now();
@@ -555,6 +500,7 @@ async function processScenario() {
         
         console.log(`⏱️ Analysis completed in ${duration} seconds`);
         
+        // Parse and display result
         analysisResult = result;
         displayResults(result);
         
@@ -575,8 +521,11 @@ async function extractTextFromFile(file) {
         reader.onload = async (e) => {
             try {
                 const base64Data = e.target.result.split(',')[1];
+                
+                // Determine MIME type
                 const mimeType = file.type;
                 
+                // Call Gemini Vision API
                 const response = await fetch(
                     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
                     {
@@ -688,6 +637,7 @@ Analisis skenario di atas dan berikan output dalam format JSON sesuai instruksi.
         const errorData = await response.json();
         console.error('❌ API Error:', errorData);
         
+        // Handle specific API errors
         if (response.status === 429) {
             throw new Error('Rate limit tercapai. Mohon tunggu beberapa saat dan coba lagi.');
         } else if (response.status === 401) {
@@ -700,26 +650,31 @@ Analisis skenario di atas dan berikan output dalam format JSON sesuai instruksi.
     const data = await response.json();
     console.log('✅ Raw API response:', data);
     
+    // Extract text from response
     let responseText = data.candidates[0].content.parts[0].text;
     console.log('📄 Response text (first 500 chars):', responseText.substring(0, 500));
 
-    responseText = responseText
-        .trim()
-        .replace(/^```json\n?/g, '')
-        .replace(/^```\n?/g, '')
-        .replace(/```\n?$/g, '')
-        .replace(/^`+|`+$/g, '');
     
+    // Clean response text (remove markdown if present)
+    responseText = responseText
+    .trim()
+    .replace(/^```json\n?/g, '')
+    .replace(/^```\n?/g, '')
+    .replace(/```\n?$/g, '')
+    .replace(/^`+|`+$/g, ''); // Remove any backticks
+    
+    // Parse JSON
     try {
         const parsedResult = JSON.parse(responseText);
         
+        // Check for error response
         if (parsedResult.error) {
             throw new Error(parsedResult.error);
         }
         
+        // Validate structure
         if (!parsedResult.kata_sulit || !parsedResult.rumusan_masalah || 
             !parsedResult.brainstorming || !parsedResult.peta_masalah || 
-            !parsedResult.learning_objective || !parsedResult.soap ||
             !parsedResult.tips_pembelajaran) {
             throw new Error('Format response tidak lengkap. Mohon coba lagi.');
         }
@@ -734,7 +689,7 @@ Analisis skenario di atas dan berikan output dalam format JSON sesuai instruksi.
     }
 }
 
-// ===== DISPLAY RESULTS (UPDATED) =====
+// ===== DISPLAY RESULTS =====
 function displayResults(result) {
     const outputContent = document.getElementById('outputContent');
     
@@ -792,141 +747,10 @@ function displayResults(result) {
         </div>
     `;
     
-    // 5. Learning Objective (NEW)
+    // 5. Tips Pembelajaran
     html += `
         <div class="output-section">
-            <h3>5️⃣ Learning Objective</h3>
-            <div class="lo-section">
-                <p style="margin-bottom: 1rem; font-weight: 600;">Mahasiswa mampu menjelaskan tentang:</p>
-                <ol class="lo-list">
-                    ${result.learning_objective.map(item => `
-                        <li class="lo-item">${escapeHtml(item)}</li>
-                    `).join('')}
-                </ol>
-            </div>
-        </div>
-    `;
-    
-    // 6. SOAP (NEW)
-    html += `
-        <div class="output-section">
-            <h3>6️⃣ SOAP</h3>
-            <div class="soap-container">
-                <!-- Subjective -->
-                <div class="soap-section">
-                    <h4 class="soap-header">📝 S = Subjective</h4>
-                    <div class="soap-content">
-                        <div class="soap-item">
-                            <span class="soap-label">Keluhan Utama:</span>
-                            <span class="soap-value">${escapeHtml(result.soap.subjective.keluhan_utama)}</span>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Riwayat Penyakit Sekarang:</span>
-                            <div class="soap-value">${formatAnswer(result.soap.subjective.riwayat_penyakit_sekarang)}</div>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Riwayat Penyakit Dahulu:</span>
-                            <span class="soap-value">${escapeHtml(result.soap.subjective.riwayat_penyakit_dahulu)}</span>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Riwayat Penyakit Keluarga:</span>
-                            <span class="soap-value">${escapeHtml(result.soap.subjective.riwayat_penyakit_keluarga)}</span>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Riwayat Sosial dan Ekonomi:</span>
-                            <div class="soap-value">${formatAnswer(result.soap.subjective.riwayat_sosial_ekonomi)}</div>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Riwayat Pemakaian Obat:</span>
-                            <span class="soap-value">${escapeHtml(result.soap.subjective.riwayat_pemakaian_obat)}</span>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Alergi:</span>
-                            <span class="soap-value">${escapeHtml(result.soap.subjective.alergi)}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Objective -->
-                <div class="soap-section">
-                    <h4 class="soap-header">🔬 O = Objective</h4>
-                    <div class="soap-content">
-                        <div class="soap-item">
-                            <span class="soap-label">Tanda Vital:</span>
-                            <div class="soap-value">${formatAnswer(result.soap.objective.tanda_vital)}</div>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Pemeriksaan Fisik:</span>
-                            <div class="soap-value">${formatAnswer(result.soap.objective.pemeriksaan_fisik)}</div>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Pemeriksaan Penunjang:</span>
-                            <div class="soap-value">${formatAnswer(result.soap.objective.pemeriksaan_penunjang)}</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Assessment -->
-                <div class="soap-section">
-                    <h4 class="soap-header">🎯 A = Assessment</h4>
-                    <div class="soap-content">
-                        <div class="soap-item">
-                            <span class="soap-label">Diagnosis Kerja:</span>
-                            <span class="soap-value">${escapeHtml(result.soap.assessment.diagnosis_kerja)}</span>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Diagnosis Banding:</span>
-                            <ul class="soap-dd-list">
-                                ${result.soap.assessment.diagnosis_banding.map(dd => `
-                                    <li>${escapeHtml(dd)}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Plan -->
-                <div class="soap-section">
-                    <h4 class="soap-header">💊 P = Plan</h4>
-                    <div class="soap-content">
-                        <div class="soap-item">
-                            <span class="soap-label">Farmakologi:</span>
-                            <ul class="soap-plan-list">
-                                ${result.soap.plan.farmakologi.map(obat => `
-                                    <li>${escapeHtml(obat)}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Non Farmakologi:</span>
-                            <ul class="soap-plan-list">
-                                ${result.soap.plan.non_farmakologi.map(item => `
-                                    <li>${escapeHtml(item)}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Monitoring:</span>
-                            <div class="soap-value">${formatAnswer(result.soap.plan.monitoring)}</div>
-                        </div>
-                        <div class="soap-item">
-                            <span class="soap-label">Edukasi (KIE):</span>
-                            <ul class="soap-plan-list">
-                                ${result.soap.plan.edukasi.map(item => `
-                                    <li>${escapeHtml(item)}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // 7. Tips Pembelajaran
-    html += `
-        <div class="output-section">
-            <h3>7️⃣ Tips Pembelajaran</h3>
+            <h3>5️⃣ Tips Pembelajaran</h3>
             <div class="tips-section">
                 <div class="tips-category">
                     <h4>📚 Konsep Dasar</h4>
@@ -969,18 +793,26 @@ function displayResults(result) {
     
     outputContent.innerHTML = html;
     
+    // Hide loading, show output
     hideLoading();
     document.getElementById('outputSection').style.display = 'block';
     
+    // Scroll to output
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
 }
 
 // ===== UTILITY FUNCTIONS =====
 function formatAnswer(answer) {
+    // Convert newlines to <br> and format lists
     let formatted = escapeHtml(answer);
     
+    // Convert bullet points
     formatted = formatted.replace(/^- (.+)$/gm, '<li>$1</li>');
-    formatted = formatted.replace(/(<li>.*<\/li>\n?)+/gs, '<ul>$&</ul>');        
+    
+    // Wrap lists
+    formatted = formatted.replace(/(<li>.*<\/li>\n?)+/gs, '<ul>$&</ul>');
+    
+    // Convert newlines to paragraphs
     formatted = formatted.split('\n\n').map(para => {
         if (!para.trim().startsWith('<')) {
             return `<p>${para}</p>`;
@@ -1063,55 +895,8 @@ function generatePlainText(result) {
     text += '-'.repeat(80) + '\n';
     text += result.peta_masalah + '\n\n';
     
-    // 5. Learning Objective
-    text += '\n5. LEARNING OBJECTIVE\n';
-    text += '-'.repeat(80) + '\n';
-    text += 'Mahasiswa mampu menjelaskan tentang:\n';
-    result.learning_objective.forEach((item, index) => {
-        text += `${index + 1}. ${item}\n`;
-    });
-    
-    // 6. SOAP
-    text += '\n6. SOAP\n';
-    text += '-'.repeat(80) + '\n';
-    text += '\nS = SUBJECTIVE\n';
-    text += `Keluhan Utama: ${result.soap.subjective.keluhan_utama}\n`;
-    text += `Riwayat Penyakit Sekarang: ${result.soap.subjective.riwayat_penyakit_sekarang}\n`;
-    text += `Riwayat Penyakit Dahulu: ${result.soap.subjective.riwayat_penyakit_dahulu}\n`;
-    text += `Riwayat Penyakit Keluarga: ${result.soap.subjective.riwayat_penyakit_keluarga}\n`;
-    text += `Riwayat Sosial dan Ekonomi: ${result.soap.subjective.riwayat_sosial_ekonomi}\n`;
-    text += `Riwayat Pemakaian Obat: ${result.soap.subjective.riwayat_pemakaian_obat}\n`;
-    text += `Alergi: ${result.soap.subjective.alergi}\n`;
-    
-    text += '\nO = OBJECTIVE\n';
-    text += `Tanda Vital: ${result.soap.objective.tanda_vital}\n`;
-    text += `Pemeriksaan Fisik: ${result.soap.objective.pemeriksaan_fisik}\n`;
-    text += `Pemeriksaan Penunjang: ${result.soap.objective.pemeriksaan_penunjang}\n`;
-    
-    text += '\nA = ASSESSMENT\n';
-    text += `Diagnosis Kerja: ${result.soap.assessment.diagnosis_kerja}\n`;
-    text += 'Diagnosis Banding:\n';
-    result.soap.assessment.diagnosis_banding.forEach((dd, index) => {
-        text += `${index + 1}. ${dd}\n`;
-    });
-    
-    text += '\nP = PLAN\n';
-    text += 'Farmakologi:\n';
-    result.soap.plan.farmakologi.forEach(obat => {
-        text += `- ${obat}\n`;
-    });
-    text += '\nNon Farmakologi:\n';
-    result.soap.plan.non_farmakologi.forEach(item => {
-        text += `- ${item}\n`;
-    });
-    text += `\nMonitoring: ${result.soap.plan.monitoring}\n`;
-    text += '\nEdukasi (KIE):\n';
-    result.soap.plan.edukasi.forEach(item => {
-        text += `- ${item}\n`;
-    });
-    
-    // 7. Tips Pembelajaran
-    text += '\n7. TIPS PEMBELAJARAN\n';
+    // 5. Tips Pembelajaran
+    text += '\n5. TIPS PEMBELAJARAN\n';
     text += '-'.repeat(80) + '\n';
     text += '\n📚 Konsep Dasar:\n';
     result.tips_pembelajaran.konsep_dasar.forEach(item => {
@@ -1138,18 +923,22 @@ function generatePlainText(result) {
 }
 
 function resetApp() {
+    // Clear all data
     currentFile = null;
     currentScenario = null;
     analysisResult = null;
     
+    // Reset UI
     document.getElementById('scenarioText').value = '';
     document.getElementById('fileInput').value = '';
     document.getElementById('filePreview').classList.remove('show');
     document.getElementById('outputSection').style.display = 'none';
     document.getElementById('errorSection').style.display = 'none';
     
+    // Show input section
     document.getElementById('inputSection').style.display = 'block';
     
+    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1166,41 +955,23 @@ function hideLoading() {
 }
 
 function showError(message) {
-    let formattedMessage = message;
-    
-    if (message.includes('API Key tidak valid')) {
-        formattedMessage += '\n\n💡 Pastikan:\n';
-        formattedMessage += '• API Key dimulai dengan "AIza"\n';
-        formattedMessage += '• API Key dari Google AI Studio (bukan Google Cloud)\n';
-        formattedMessage += '• API Key sudah diaktifkan';
-    } else if (message.includes('Rate limit')) {
-        formattedMessage += '\n\n⏳ Tips:\n';
-        formattedMessage += '• Free tier: 15 requests per menit\n';
-        formattedMessage += '• Tunggu 1 menit lalu coba lagi\n';
-        formattedMessage += '• Atau upgrade ke paid plan';
-    } else if (message.includes('koneksi')) {
-        formattedMessage += '\n\n🌐 Troubleshooting:\n';
-        formattedMessage += '• Periksa koneksi internet\n';
-        formattedMessage += '• Coba refresh halaman\n';
-        formattedMessage += '• Nonaktifkan VPN jika ada';
-    }
-    
-    document.getElementById('errorMessage').textContent = formattedMessage;
+    document.getElementById('errorMessage').textContent = message;
     document.getElementById('inputSection').style.display = 'none';
     document.getElementById('loadingSection').style.display = 'none';
     document.getElementById('outputSection').style.display = 'none';
     document.getElementById('errorSection').style.display = 'block';
-    
-    document.getElementById('errorSection').scrollIntoView({ behavior: 'smooth' });
 }
 
 function showToast(message, type = 'success') {
+    // Remove existing toasts first
     const existingToasts = document.querySelectorAll('.toast-notification');
     existingToasts.forEach(toast => toast.remove());
     
+    // Create toast
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
     
+    // Set color based on type
     let bgColor = 'var(--primary)';
     if (type === 'error') {
         bgColor = 'var(--error)';
@@ -1230,9 +1001,10 @@ function showToast(message, type = 'success') {
     setTimeout(() => {
         toast.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => toast.remove(), 300);
-    }, 5000);
+    }, 5000); // 5 seconds for error messages
 }
 
+// Add animations to CSS
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -1257,128 +1029,37 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
 
-// Add SOAP and LO specific styles
-const soapStyles = document.createElement('style');
-soapStyles.textContent = `
-    /* ===== LEARNING OBJECTIVE STYLES ===== */
-    .lo-section {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        padding: 1.5rem;
-        border-radius: 8px;
-        border-left: 4px solid #f59e0b;
+function showError(message) {
+    // Tambahkan emoji dan formatting
+    let formattedMessage = message;
+    
+    // Add helpful context based on error type
+    if (message.includes('API Key tidak valid')) {
+        formattedMessage += '\n\n💡 Pastikan:\n';
+        formattedMessage += '• API Key dimulai dengan "AIza"\n';
+        formattedMessage += '• API Key dari Google AI Studio (bukan Google Cloud)\n';
+        formattedMessage += '• API Key sudah diaktifkan';
+    } else if (message.includes('Rate limit')) {
+        formattedMessage += '\n\n⏳ Tips:\n';
+        formattedMessage += '• Free tier: 15 requests per menit\n';
+        formattedMessage += '• Tunggu 1 menit lalu coba lagi\n';
+        formattedMessage += '• Atau upgrade ke paid plan';
+    } else if (message.includes('koneksi')) {
+        formattedMessage += '\n\n🌐 Troubleshooting:\n';
+        formattedMessage += '• Periksa koneksi internet\n';
+        formattedMessage += '• Coba refresh halaman\n';
+        formattedMessage += '• Nonaktifkan VPN jika ada';
     }
     
-    .lo-list {
-        margin-left: 1.5rem;
-        line-height: 1.8;
-    }
+    document.getElementById('errorMessage').textContent = formattedMessage;
+    document.getElementById('inputSection').style.display = 'none';
+    document.getElementById('loadingSection').style.display = 'none';
+    document.getElementById('outputSection').style.display = 'none';
+    document.getElementById('errorSection').style.display = 'block';
     
-    .lo-item {
-        margin-bottom: 0.75rem;
-        color: var(--text);
-        font-size: 1rem;
-    }
-    
-    .lo-item:last-child {
-        font-weight: 600;
-        color: var(--primary);
-        margin-top: 0.5rem;
-        padding-top: 0.5rem;
-        border-top: 2px dashed rgba(0,0,0,0.1);
-    }
-    
-    /* ===== SOAP STYLES ===== */
-    .soap-container {
-        background: var(--background);
-        padding: 1.5rem;
-        border-radius: 8px;
-        border: 2px solid var(--border);
-    }
-    
-    .soap-section {
-        background: white;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: var(--shadow);
-    }
-    
-    .soap-section:last-child {
-        margin-bottom: 0;
-    }
-    
-    .soap-header {
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 3px solid var(--primary);
-        color: var(--primary);
-    }
-    
-    .soap-content {
-        line-height: 1.8;
-    }
-    
-    .soap-item {
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px dashed var(--border);
-    }
-    
-    .soap-item:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-    }
-    
-    .soap-label {
-        display: inline-block;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 0.5rem;
-        min-width: 200px;
-    }
-    
-    .soap-value {
-        display: block;
-        color: var(--text);
-        margin-left: 0;
-        margin-top: 0.5rem;
-    }
-    
-    .soap-dd-list,
-    .soap-plan-list {
-        margin-left: 1.5rem;
-        margin-top: 0.5rem;
-    }
-    
-    .soap-dd-list li,
-    .soap-plan-list li {
-        margin-bottom: 0.5rem;
-        line-height: 1.6;
-    }
-    
-    /* Responsive SOAP */
-    @media (max-width: 768px) {
-        .soap-container {
-            padding: 1rem;
-        }
-        
-        .soap-section {
-            padding: 1rem;
-        }
-        
-        .soap-label {
-            min-width: auto;
-            display: block;
-        }
-        
-        .soap-value {
-            margin-left: 0;
-        }
-    }
-`;
-document.head.appendChild(soapStyles);
+    // Scroll to error
+    document.getElementById('errorSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.head.appendChild(style);
