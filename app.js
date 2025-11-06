@@ -38,6 +38,12 @@ Seven Jumps adalah metode Problem-Based Learning (PBL) yang digunakan di fakulta
 - Menghubungkan aspek preventif, promotif, kuratif, rehabilitatif
 - Memasukkan perspektif holistik (bio-psiko-sosial-spiritual jika relevan)
 
+## Struktur Jawaban:
+- Brainstorming: Jawaban lengkap dengan sub-poin, bukan bullet points singkat
+- Menjelaskan "mengapa" dan "bagaimana", bukan hanya "apa"
+- Menyertakan contoh klinis atau mekanisme fisiologis
+- Menggunakan numbering untuk organisasi yang jelas
+
 # OUTPUT FORMAT
 
 Berikan output dalam format JSON berikut (PENTING: hanya JSON murni, tanpa markdown atau backticks):
@@ -96,7 +102,7 @@ Berikan output dalam format JSON berikut (PENTING: hanya JSON murni, tanpa markd
   }
 }
 
-## Penjelasan Field Baru:
+## Penjelasan Setiap Field:
 
 ### 1. kata_sulit (Array of Objects)
 - term: Istilah medis/kompleks dari skenario
@@ -203,7 +209,7 @@ Format dokumentasi klinis standar SOAP:
 7. ✅ Dosis obat harus sesuai guideline Indonesia (PAPDI, PERDOSKI, IDAI, dll)
 8. ✅ JANGAN GUNAKAN markdown backticks di response - langsung JSON object saja
 
-# EXAMPLE PATTERN (dari dokumen referensi)
+# EXAMPLE PATTERN (Simplified)
 Dari dokumen referensi tutorial medis, perhatikan pola ini:
 
 **Kata Sulit:**
