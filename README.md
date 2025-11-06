@@ -34,7 +34,7 @@ localStorage.removeItem('medjumps_api_key'); // Hapus api_key
 
 3. Buka **Settings** → **Pages**
 4. Pilih **main branch** sebagai source
-5. Website akan tersedia di `https://justintimber949.github.io/medjumps/`
+5. Website akan tersedia di [Medjumps](https://justintimber949.github.io/medjumps/)
 
 ### 3. Cara Pakai
 
