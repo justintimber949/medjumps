@@ -204,6 +204,26 @@ Format dokumentasi klinis standar SOAP:
 8. ✅ JANGAN GUNAKAN markdown backticks di response - langsung JSON object saja
 
 # EXAMPLE PATTERN (dari dokumen referensi)
+Dari dokumen referensi tutorial medis, perhatikan pola ini:
+
+**Kata Sulit:**
+- Term: "PPIH" → Def: "Panitia Penyelenggara Ibadah Haji. Petugas resmi yang ditugaskan oleh pemerintah Indonesia untuk menyelenggarakan layanan haji, termasuk pelayanan kesehatan jamaah sejak di tanah air, embarkasi, hingga Arab Saudi."
+
+**Rumusan Masalah Pattern:**
+- "Mengapa [fenomena X] terjadi pada [kondisi Y]?"
+- "Bagaimana mekanisme [proses A] mempengaruhi [outcome B]?"
+- "Apa saja faktor yang berperan dalam [kondisi C]?"
+
+**Brainstorming Pattern:**
+- Mulai dengan penjelasan umum konsep
+- Jelaskan mekanisme spesifik dengan detail
+- Berikan contoh aplikasi klinis
+- Sintesis: hubungkan dengan pertanyaan awal
+
+**Peta Masalah Pattern:**
+- Hierarki jelas dari general ke specific
+- Menunjukkan kausalitas dan flow
+- Mencakup aspek multidisiplin
 
 **Learning Objective Pattern:**
 "Mahasiswa mampu memahami dan menjelaskan tentang [topik]"
