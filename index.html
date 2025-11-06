@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedJumps - Asisten Tutorial Seven Jumps</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>🎓 MedJumps Assistant</h1>
+            <p>Asisten Tutorial Seven Jumps untuk Mahasiswa Kedokteran</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- API Key Setup (First Time) -->
+        <section id="apiKeySection" class="card">
+            <h2>⚙️ Setup API Key</h2>
+            <p>Masukkan Gemini API Key Anda (hanya sekali, disimpan di browser)</p>
+            <div class="input-group">
+                <input 
+                    type="password" 
+                    id="apiKeyInput" 
+                    placeholder="Masukkan Gemini API Key..."
+                    class="input-field"
+                >
+                <button onclick="saveApiKey()" class="btn btn-primary">
+                    💾 Simpan
+                </button>
+            </div>
+            <p class="help-text">
+                Belum punya? Dapatkan gratis di 
+                <a href="https://aistudio.google.com/app/apikey" target="_blank">
+                    Google AI Studio
+                </a>
+            </p>
+        </section>
+
+        <!-- Input Section -->
+        <section id="inputSection" class="card" style="display: none;">
+            <h2>📝 Input Skenario</h2>
+            
+            <!-- Tab Selection -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('text')">
+                    📄 Paste Text
+                </button>
+                <button class="tab-btn" onclick="switchTab('file')">
+                    📎 Upload File
+                </button>
+            </div>
+
+            <!-- Text Input -->
+            <div id="textTab" class="tab-content active">
+                <textarea 
+                    id="scenarioText" 
+                    placeholder="Paste skenario kasus di sini..."
+                    rows="10"
+                    class="textarea-field"
+                ></textarea>
+            </div>
+
+            <!-- File Upload -->
+            <div id="fileTab" class="tab-content">
+                <div class="upload-area" id="uploadArea">
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        accept=".pdf,.png,.jpg,.jpeg"
+                        style="display: none;"
+                        onchange="handleFileSelect(event)"
+                    >
+                    <label for="fileInput" class="upload-label">
+                        <div class="upload-icon">📁</div>
+                        <p>Klik atau drag & drop file</p>
+                        <p class="upload-hint">PDF, PNG, JPG (Max 10MB)</p>
+                    </label>
+                </div>
+                <div id="filePreview" class="file-preview"></div>
+            </div>
+
+            <!-- Process Button -->
+            <button 
+                onclick="processScenario()" 
+                class="btn btn-primary btn-large"
+                id="processBtn"
+            >
+                🚀 Proses Skenario
+            </button>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loadingSection" class="card" style="display: none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Menganalisis skenario dengan AI...</p>
+                <p class="loading-hint">Ini mungkin memakan waktu 20-40 detik</p>
+            </div>
+        </section>
+
+        <!-- Output Section -->
+        <section id="outputSection" class="card" style="display: none;">
+            <div class="output-header">
+                <h2>📊 Hasil Analisis</h2>
+                <div class="output-actions">
+                    <button onclick="copyOutput()" class="btn btn-secondary">
+                        📋 Copy
+                    </button>
+                    <button onclick="downloadOutput()" class="btn btn-secondary">
+                        💾 Download
+                    </button>
+                    <button onclick="resetApp()" class="btn btn-outline">
+                        🔄 Reset
+                    </button>
+                </div>
+            </div>
+
+            <div id="outputContent" class="output-content">
+                <!-- Dynamic content akan di-render di sini -->
+            </div>
+        </section>
+
+        <!-- Error Section -->
+        <section id="errorSection" class="card error-card" style="display: none;">
+            <h3>❌ Terjadi Kesalahan</h3>
+            <p id="errorMessage"></p>
+            <button onclick="resetApp()" class="btn btn-primary">
+                🔄 Coba Lagi
+            </button>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Made with ❤️ for Medical Students | Powered by Gemini AI</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
