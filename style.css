@@ -487,3 +487,70 @@ body {
 .mb-1 { margin-bottom: 0.5rem; }
 .mb-2 { margin-bottom: 1rem; }
 .mb-3 { margin-bottom: 1.5rem; }
+
+/* ===== VALIDATION INFO ===== */
+.validation-info {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+
+.validation-steps {
+    font-size: 0.95rem;
+}
+
+.validation-steps ol {
+    margin: 0.5rem 0 0 1.5rem;
+    padding: 0;
+}
+
+.validation-steps li {
+    margin-bottom: 0.25rem;
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section-header h2 {
+    margin-bottom: 0;
+}
+
+/* ===== BUTTON SMALL ===== */
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* ===== LOADING STATE FOR INPUT ===== */
+.input-field:disabled,
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ===== API KEY INPUT SECURITY ===== */
+#apiKeyInput {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+}
+
+/* ===== RESPONSIVE SECTION HEADER ===== */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .section-header .btn-small {
+        width: 100%;
+    }
+}

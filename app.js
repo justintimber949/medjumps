@@ -213,28 +213,179 @@ function setupEventListeners() {
             handleFile(files[0]);
         }
     });
+
+    // Show validation info when API Key input is focused
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const validationInfo = document.getElementById('validationInfo');
+    
+    if (apiKeyInput && validationInfo) {
+        apiKeyInput.addEventListener('focus', () => {
+            validationInfo.style.display = 'block';
+        });
+    }
 }
 
 // ===== API KEY MANAGEMENT =====
-function saveApiKey() {
-    const apiKey = document.getElementById('apiKeyInput').value.trim();
+// ===== API KEY MANAGEMENT (UPDATED) =====
+
+async function saveApiKey() {
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const apiKey = apiKeyInput.value.trim();
     
     if (!apiKey) {
-        showError('API Key tidak boleh kosong!');
+        showToast('⚠️ API Key tidak boleh kosong!', 'warning');
         return;
     }
 
-    // Simple validation
+    // Simple format validation
     if (!apiKey.startsWith('AIza')) {
-        showError('Format API Key tidak valid. API Key Gemini dimulai dengan "AIza"');
+        showToast('⚠️ Format API Key tidak valid. Harus dimulai dengan "AIza"', 'error');
         return;
     }
 
-    localStorage.setItem(CONFIG.STORAGE_KEY, apiKey);
-    document.getElementById('apiKeySection').style.display = 'none';
-    document.getElementById('inputSection').style.display = 'block';
+    // Get button and show loading state
+    const saveBtn = document.getElementById('saveKeyBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '🔄 Memvalidasi...';
+    apiKeyInput.disabled = true;
+
+    // Show validation info
+    const validationInfo = document.getElementById('validationInfo');
+    if (validationInfo) {
+        validationInfo.style.display = 'block';
+    }
+
+    try {
+        // Test API Key dengan request sederhana
+        const isValid = await validateApiKey(apiKey);
+        
+        if (isValid) {
+            // Save to localStorage
+            localStorage.setItem(CONFIG.STORAGE_KEY, apiKey);
+            
+            // Hide validation info
+            if (validationInfo) {
+                validationInfo.style.display = 'none';
+            }
+            
+            // Show success
+            showToast('✅ API Key valid dan berhasil disimpan!', 'success');
+            
+            // Hide API Key section, show input section
+            setTimeout(() => {
+                document.getElementById('apiKeySection').style.display = 'none';
+                document.getElementById('inputSection').style.display = 'block';
+                
+                // Reset button state
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+                apiKeyInput.disabled = false;
+            }, 1500);
+            
+        } else {
+            throw new Error('API Key tidak valid atau tidak memiliki akses ke Gemini API');
+        }
+        
+    } catch (error) {
+        console.error('API Key validation error:', error);
+        
+        // Show error toast
+        showToast('❌ ' + error.message, 'error');
+        
+        // Reset button state
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        apiKeyInput.disabled = false;
+        apiKeyInput.focus();
+        
+        // Hide validation info
+        if (validationInfo) {
+            validationInfo.style.display = 'none';
+        }
+    }
+}
+
+// ===== NEW FUNCTION: VALIDATE API KEY =====
+async function validateApiKey(apiKey) {
+    try {
+        console.log('🔍 Validating API Key...');
+        
+        // Test dengan request sederhana ke Gemini API
+        const testPrompt = "Respond with only: OK";
+        
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: testPrompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 10,
+                    }
+                })
+            }
+        );
+
+        console.log('📡 Validation response status:', response.status);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ API Key valid!');
+            return true;
+        } else {
+            const errorData = await response.json();
+            console.error('❌ API Key validation failed:', errorData);
+            
+            // Handle specific errors
+            if (response.status === 400) {
+                if (errorData.error?.message?.includes('API key not valid')) {
+                    throw new Error('API Key tidak valid. Pastikan Anda menggunakan API Key yang benar dari Google AI Studio.');
+                } else if (errorData.error?.message?.includes('not found')) {
+                    throw new Error('Model tidak ditemukan. Pastikan API Key Anda memiliki akses ke Gemini API.');
+                }
+            } else if (response.status === 403) {
+                throw new Error('API Key tidak memiliki permission. Pastikan API Key sudah diaktifkan di Google AI Studio.');
+            } else if (response.status === 429) {
+                throw new Error('Rate limit tercapai. Tunggu sebentar dan coba lagi.');
+            }
+            
+            throw new Error(`Validasi gagal: ${errorData.error?.message || 'Unknown error'}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Validation error:', error);
+        
+        if (error.message.includes('fetch')) {
+            throw new Error('Gagal terhubung ke server. Periksa koneksi internet Anda.');
+        }
+        
+        throw error;
+    }
+}
+
+// ===== NEW FUNCTION: CHANGE API KEY =====
+function changeApiKey() {
+    const confirmed = confirm(
+        '⚠️ Yakin ingin mengganti API Key?\n\n' +
+        'Anda harus memasukkan dan memvalidasi API Key baru.'
+    );
     
-    showToast('✅ API Key berhasil disimpan!');
+    if (confirmed) {
+        localStorage.removeItem(CONFIG.STORAGE_KEY);
+        showToast('🔄 Silakan masukkan API Key baru');
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
 }
 
 // ===== TAB SWITCHING =====
@@ -811,20 +962,38 @@ function showError(message) {
     document.getElementById('errorSection').style.display = 'block';
 }
 
-function showToast(message) {
-    // Simple toast notification
+function showToast(message, type = 'success') {
+    // Remove existing toasts first
+    const existingToasts = document.querySelectorAll('.toast-notification');
+    existingToasts.forEach(toast => toast.remove());
+    
+    // Create toast
     const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    
+    // Set color based on type
+    let bgColor = 'var(--primary)';
+    if (type === 'error') {
+        bgColor = 'var(--error)';
+    } else if (type === 'warning') {
+        bgColor = '#f59e0b';
+    } else if (type === 'success') {
+        bgColor = 'var(--secondary)';
+    }
+    
     toast.style.cssText = `
         position: fixed;
         bottom: 2rem;
         right: 2rem;
-        background: var(--primary);
+        background: ${bgColor};
         color: white;
         padding: 1rem 1.5rem;
         border-radius: 8px;
         box-shadow: var(--shadow-lg);
         z-index: 1000;
         animation: slideIn 0.3s ease;
+        max-width: 400px;
+        word-wrap: break-word;
     `;
     toast.textContent = message;
     document.body.appendChild(toast);
@@ -832,7 +1001,7 @@ function showToast(message) {
     setTimeout(() => {
         toast.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 5000); // 5 seconds for error messages
 }
 
 // Add animations to CSS
@@ -860,4 +1029,37 @@ style.textContent = `
         }
     }
 `;
+
+function showError(message) {
+    // Tambahkan emoji dan formatting
+    let formattedMessage = message;
+    
+    // Add helpful context based on error type
+    if (message.includes('API Key tidak valid')) {
+        formattedMessage += '\n\n💡 Pastikan:\n';
+        formattedMessage += '• API Key dimulai dengan "AIza"\n';
+        formattedMessage += '• API Key dari Google AI Studio (bukan Google Cloud)\n';
+        formattedMessage += '• API Key sudah diaktifkan';
+    } else if (message.includes('Rate limit')) {
+        formattedMessage += '\n\n⏳ Tips:\n';
+        formattedMessage += '• Free tier: 15 requests per menit\n';
+        formattedMessage += '• Tunggu 1 menit lalu coba lagi\n';
+        formattedMessage += '• Atau upgrade ke paid plan';
+    } else if (message.includes('koneksi')) {
+        formattedMessage += '\n\n🌐 Troubleshooting:\n';
+        formattedMessage += '• Periksa koneksi internet\n';
+        formattedMessage += '• Coba refresh halaman\n';
+        formattedMessage += '• Nonaktifkan VPN jika ada';
+    }
+    
+    document.getElementById('errorMessage').textContent = formattedMessage;
+    document.getElementById('inputSection').style.display = 'none';
+    document.getElementById('loadingSection').style.display = 'none';
+    document.getElementById('outputSection').style.display = 'none';
+    document.getElementById('errorSection').style.display = 'block';
+    
+    // Scroll to error
+    document.getElementById('errorSection').scrollIntoView({ behavior: 'smooth' });
+}
+
 document.head.appendChild(style);

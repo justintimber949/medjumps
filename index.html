@@ -18,31 +18,60 @@
     <!-- Main Content -->
     <main class="container">
         <!-- API Key Setup (First Time) -->
+        <!-- API Key Setup (First Time) -->
         <section id="apiKeySection" class="card">
             <h2>⚙️ Setup API Key</h2>
-            <p>Masukkan Gemini API Key Anda (hanya sekali, disimpan di browser)</p>
+            <p>Masukkan Gemini API Key Anda. Kami akan memvalidasi key sebelum menyimpannya.</p>
+            
             <div class="input-group">
                 <input 
                     type="password" 
                     id="apiKeyInput" 
-                    placeholder="Masukkan Gemini API Key..."
+                    placeholder="Masukkan Gemini API Key (AIza...)"
                     class="input-field"
+                    autocomplete="off"
                 >
-                <button onclick="saveApiKey()" class="btn btn-primary">
-                    💾 Simpan
+                <button onclick="saveApiKey()" class="btn btn-primary" id="saveKeyBtn">
+                    💾 Simpan & Validasi
                 </button>
             </div>
-            <p class="help-text">
-                Belum punya? Dapatkan gratis di 
-                <a href="https://aistudio.google.com/app/apikey" target="_blank">
-                    Google AI Studio
-                </a>
-            </p>
+            
+            <div class="help-text">
+                <p style="margin-bottom: 0.5rem;">
+                    ℹ️ API Key akan divalidasi terlebih dahulu untuk memastikan dapat digunakan.
+                </p>
+                <p>
+                    Belum punya? Dapatkan gratis di 
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank">
+                        Google AI Studio
+                    </a>
+                </p>
+            </div>
+            
+            <!-- Validation Info Box -->
+            <div id="validationInfo" class="validation-info" style="display: none;">
+                <div class="validation-steps">
+                    <p><strong>Proses Validasi:</strong></p>
+                    <ol>
+                        <li>✅ Format API Key dicek</li>
+                        <li>🔄 Koneksi ke Gemini API ditest</li>
+                        <li>✅ Permission dan akses diverifikasi</li>
+                    </ol>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        Proses ini memakan waktu 3-5 detik.
+                    </p>
+                </div>
+            </div>
         </section>
 
         <!-- Input Section -->
         <section id="inputSection" class="card" style="display: none;">
-            <h2>📝 Input Skenario</h2>
+            <div class="section-header">
+                <h2>📝 Input Skenario</h2>
+                <button onclick="changeApiKey()" class="btn btn-outline btn-small">
+                    🔑 Ganti API Key
+                </button>
+            </div>
             
             <!-- Tab Selection -->
             <div class="tabs">
